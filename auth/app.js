@@ -39,7 +39,10 @@ app.use("/api/auth", authRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json(err.message || "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+  res.status(500).json({
+    status: "fail",
+    message: err.message || "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+  });
 });
 
 // 404 middleware'ı
