@@ -49,8 +49,53 @@ class AuthService {
     await user.save();
     return { user, ...tokens };
   }
-  async login() {}
-  async refresh() {}
+  async login(email, password) {
+    try {
+      // bu emailde kullanıcı var mı
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new Error("Kullanıcı bulunamadı.");
+      }
+      // kullanıcı hesabı aktif mi ?
+      if (!user.isActive) {
+        throw new Error("Kullanıcı hesabı inaktif.");
+      }
+
+      // yapılan şifre doğru mu
+      const isValid = await user.comparePassword(password);
+      if (!isValid) {
+        throw new Error("Şifre yanlış.");
+      }
+      // son giriş tarihini güncelle
+      user.lastLogin = new Date();
+      await user.save();
+
+      // kullanıcının tokenlerini oluştur
+      const tokens = this.generateTokens(user);
+      return { ...tokens, user };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async refresh(token) {
+    try {
+      // refresh token geçerli mi kontrol et
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      const user = await User.findById(decoded.userId);
+      // kullanıcı hesabı hala aktif mi kontrol et
+      if (!user || !user.isActive) {
+        throw new Error("Kullanıcı bulunamadı veya hesap inaktif.");
+      }
+      // yeni access token oluştur
+      const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      });
+      // yeni access token return et
+      return accessToken;
+    } catch (error) {
+      throw new Error("Token doğrulama hatası.");
+    }
+  }
   async logout() {}
 }
 

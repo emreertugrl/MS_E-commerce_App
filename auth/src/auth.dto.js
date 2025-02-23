@@ -13,8 +13,8 @@ const loginSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 // abortEarly : ilk hatada durmasını sağlar, false yaparsak tüm hataları döner.
-async function validateUserDto(data) {
-  const { error, value } = registerSchema.validate(data, { abortEarly: false });
+async function validateDto(schema, data) {
+  const { error, value } = schema.validate(data, { abortEarly: false });
   if (error) {
     const messages = error.details.map((detail) => detail.message).join(",");
     throw new Error(messages);
@@ -23,5 +23,7 @@ async function validateUserDto(data) {
 }
 
 module.exports = {
-  validateUserDto,
+  validateDto,
+  loginSchema,
+  registerSchema,
 };

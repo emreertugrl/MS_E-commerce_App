@@ -4,7 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-
+const cookieParser = require("cookie-parser");
 // proje içi importları
 const authRoutes = require("./src/auth.routes");
 // dotenv
@@ -24,7 +24,7 @@ app.use(express.json()); // cevapları json çevirir.
 app.use(cors()); // frontend ile iletişime geçmemizi sağlar
 app.use(helmet()); // headers güvenlik header ekler
 app.use(morgan("dev")); // loglamaya yarar hataları gösterir
-
+app.use(cookieParser());
 // rate limiter
 const limiter = rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW * 60 * 1000, //
