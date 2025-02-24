@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Product = require("./product.model");
 // business logic'i ve veritabanı ile iletişime geçecek olan katman.
 class AuthService {
@@ -36,6 +37,25 @@ class AuthService {
       if (query.maxPrice) filter.price = { ...filter.price, $lte: query.maxPrice };
 
       return await Product.find(filter);
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getProductById(productId) {
+    try {
+      // ObjectId kontrolü
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        throw new Error("Geçersiz ID.");
+      }
+      return await Product.findById(productId);
+    } catch (error) {
+      throw error;
+    }
+  }
+  async updateProduct(id, data) {
+    try {
+      // runValidation modeldeki schema tekrar çalıştır demek
+      return await Product.findByIdAndUpdate(id, data, { new: true, runValidators: true });
     } catch (error) {
       throw error;
     }

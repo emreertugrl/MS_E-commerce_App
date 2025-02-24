@@ -27,9 +27,7 @@ class ProductController {
       const products = await ProductService.getAllProducts(query);
 
       if (products.length < 1) {
-        return res
-          .status(404)
-          .json({ message: "Arama yaptığınız kriterlere uygun ürün bulunamadı" });
+        return res.status(404).json({ error: "Arama yaptığınız kriterlere uygun ürün bulunamadı" });
       }
       res.status(200).json({ result: products.length, products });
     } catch (error) {
@@ -39,7 +37,14 @@ class ProductController {
 
   async getProduct(req, res, next) {
     try {
-      res.status(200).json(" Ürün Alındı");
+      // route yazdığımı /:id kısmındaki id
+      const { id } = req.params;
+      // servis katmanında veritabanından verileri al
+      const product = await ProductService.getProductById(id);
+      if (!product) {
+        return res.status(404).json({ error: "Böyle bir ürün bulunamadı" });
+      }
+      res.status(200).json({ product });
     } catch (error) {
       next(error);
     }
@@ -47,7 +52,14 @@ class ProductController {
 
   async updateProduct(req, res, next) {
     try {
-      res.status(200).json("Ürün Güncellendi");
+      const { id } = req.params;
+      const updateProduct = req.body;
+      // Servic katmanı ile iletişime geç
+      const updatedProduct = await ProductService.updateProduct(id, updateProduct);
+      if (!updatedProduct) {
+        return res.status(404).json({ error: "Böyle bir ürün bulunamadı" });
+      }
+      res.status(200).json({ product: updatedProduct });
     } catch (error) {
       next(error);
     }
