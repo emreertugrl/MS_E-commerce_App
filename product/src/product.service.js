@@ -1,4 +1,4 @@
-const amqp = require("amqplib");
+const Product = require("./product.model");
 // business logic'i ve veritabanı ile iletişime geçecek olan katman.
 class AuthService {
   constructor() {
@@ -19,10 +19,27 @@ class AuthService {
       console.error("RabbitMQ Bağlantı hatası:", error);
     }
   }
-  static async register() {}
-  static async login() {}
-  static async refresh() {}
-  static async logout() {}
+  async createProduct(productData) {
+    try {
+      const product = new Product(productData);
+      return await product.save();
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getAllProducts(query) {
+    try {
+      const filter = { isActive: true };
+      if (query.title) filter.name = { $regex: query.title, $options: "i" };
+      if (query.category) filter.category = query.category;
+      if (query.minPrice) filter.price = { $gte: query.minPrice };
+      if (query.maxPrice) filter.price = { ...filter.price, $lte: query.maxPrice };
+
+      return await Product.find(filter);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AuthService();

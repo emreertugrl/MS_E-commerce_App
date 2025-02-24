@@ -1,7 +1,14 @@
 const Joi = require("joi");
+const { defaultImageUrl } = require("../constants");
 
-const registerSchema = Joi.object({
-  email: Joi.string().email().required(),
+const productSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+  price: Joi.number().min(0).required(),
+  stock: Joi.number().min(0).required().default(0),
+  category: Joi.string().required(),
+  imageUrl: Joi.string().default(defaultImageUrl),
+  isActive: Joi.boolean().default(true),
 });
 
 // abortEarly : ilk hatada durmasını sağlar, false yaparsak tüm hataları döner.
@@ -16,6 +23,5 @@ async function validateDto(schema, data) {
 
 module.exports = {
   validateDto,
-  loginSchema,
-  registerSchema,
+  productSchema,
 };

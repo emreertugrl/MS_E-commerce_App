@@ -24,7 +24,7 @@ exports.authenticate = async (req, res, next) => {
 };
 // admin middleware
 exports.admin = async (req, res, next) => {
-  if (req.user || req.user.role === "admin") {
+  if (req.user && req.user.role === "admin") {
     next();
   } else {
     res.status(403).json({ message: "Bu route'a erişime yetkiniz yok" });
