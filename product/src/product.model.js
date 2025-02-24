@@ -1,23 +1,52 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt.js");
 
 const productSchema = new mongoose.Schema(
   {
-    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    stock: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    imageUrl: {
+      type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// client'a cevap göndermeden önce hassas verileri gizle
+// client'a cevap göndermden önce hassas verileri gizle
 productSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.__v;
   return obj;
 };
-// module oluşturulur.
 
+// model oluştur
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
