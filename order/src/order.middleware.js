@@ -1,32 +1,35 @@
 const jwt = require("jsonwebtoken");
 
-// tokeni doğrulayacak middleware
+// tokeni doğrulyacak middleware
 exports.authenticate = async (req, res, next) => {
-  // header olarak access token geldi mi
+  // header olarak access token geldi mi kontrol et
   const authHeader = req.headers.authorization;
-  // Bearer token'ın varlığı kontrol ediliyor
+  console.log(authHeader);
   if (!authHeader) {
-    return res.status(403).json({ message: "Bu route'a erişime yetkiniz yok" });
+    return res.status(401).json({ message: "Bu route'a erişme yetkiniz yok" });
   }
+
+  // tokenı al
   const accessToken = authHeader.split(" ")[1];
+
+  // tokenı doğrula
   try {
-    // token'ın geçerli olduğunu kontrol et
-    // JWT token'ı decode edip kullanıcı bilgilerini alın
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
     req.user = decoded;
-    next(); // middleware'in devam edip etmemesi için next() fonksiyonu çağrılır
+
+    next();
   } catch (error) {
-    if (error.message === "invalid signature") {
-      res.status(401).json({ message: "Bu route'a erişim yetkiniz yok" });
-    }
-    next(error);
+    console.log(error);
+    return res.status(401).json({ message: "Bu route'a erişme yetkiniz yok" });
   }
 };
-// admin middleware
-exports.admin = async (req, res, next) => {
-  if (req.user || req.user.role === "admin") {
+
+// sadece adminlere izin veren mw
+exports.admin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
     next();
   } else {
-    res.status(403).json({ message: "Bu route'a erişime yetkiniz yok" });
+    res.status(403).json({ message: "Erişim reddedildi. Sadece admin." });
   }
 };

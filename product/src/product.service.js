@@ -1,23 +1,42 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
+const amqp = require("amqplib");
 const Product = require("./product.model");
 // business logic'i ve veritabanı ile iletişime geçecek olan katman.
-class AuthService {
+class ProductService {
   constructor() {
+    this.connection = null;
     this.channel = null;
     this.initializeRabbitMq(); // RabbitMq bağlantısı başlatılır(hemen çalıştırmak için)
   }
   // RabbitMq bağlantı fonksiyonu
   async initializeRabbitMq() {
     try {
-      const connection = await amqp.connect(process.env.RABBITMQ_URL);
-      this.channel = await connection.createChannel();
-      await this.channel.assertExchange(process.env.RABBITMQ_EXCHANGE, "topic", {
-        durable: true, // mesajı kuyrukta uzun süreli saklanmasını sağlar
+      this.connection = await amqp.connect(process.env.RABBITMQ_URL);
+      this.channel = await this.connection.createChannel();
+      await this.channel.assertQueue(process.env.RABBITMQ_PRODUCT_QUEUE);
+      // products kuyruğuna gelen mesajları dinle
+      await this.channel.consume(process.env.RABBITMQ_PRODUCT_QUEUE, async (data) => {
+        try {
+          // kanaldan gelen mesaja erişiriz.
+          const orderData = JSON.parse(data.content.toString());
+          // stokları güncelleyecek metod çalıştırılır.
+          await this.processOrders(orderData); // yapılacak işleme veriyi gönderir.
+          this.channel.ack(data); // mesajı kuyruğundan çıkar
+        } catch (error) {
+          console.error("Sipariş işleme hatası:", error);
+          this.channel.nack(data); // mesajı kuyruğa geri gönder
+        }
       });
-      await this.channel.assertQueue(process.env.RABBITMQ_QUEUE);
       console.log("RabbitMQ bağlandı");
     } catch (error) {
       console.error("RabbitMQ Bağlantı hatası:", error);
+    }
+  }
+  // sipariş edilen her ürün için stok eksiltir
+  async processOrders(orderData) {
+    const { products } = orderData;
+    for (const product of products) {
+      await this.updateStock(product.productId, -product.quantity);
     }
   }
   async createProduct(productData) {
@@ -88,4 +107,4 @@ class AuthService {
   }
 }
 
-module.exports = new AuthService();
+module.exports = new ProductService();
