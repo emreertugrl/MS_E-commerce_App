@@ -35,7 +35,6 @@ class AuthController {
       });
       res.status(200).json(result);
     } catch (error) {
-      console.log("Login___Hata_______________________________________", error);
       if (error.message === "Böyle bir email ve şifre ile kayıtlı bir kullanıcı bulunamadı.") {
         return res.status(401).json({ message: error.message });
       }
@@ -55,17 +54,21 @@ class AuthController {
       // client'e gönder
       return res.status(200).json({ accessToken });
     } catch (error) {
-      console.log("Refresh___Hata_______________________________________", error);
-      if (error.message === "Token doğrulaması başarısız.") {
-        return res.status(401).json({ message: error.message });
-      }
       next(error);
     }
   }
   async logout(req, res, next) {
     try {
+      res.clearCookie("refreshToken");
+      res.json({ message: "Çıkış yapıldı." });
     } catch (error) {
-      console.log("Logout___Hata_______________________________________", error);
+      next(error);
+    }
+  }
+  async getProfile(req, res, next) {
+    try {
+      res.json(req.user);
+    } catch (error) {
       next(error);
     }
   }

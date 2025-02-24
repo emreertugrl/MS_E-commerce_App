@@ -32,6 +32,21 @@ class AuthService {
     });
     return { accessToken, refreshToken };
   }
+  async validateToken(token) {
+    try {
+      // refresh token geçerli mi kontrol et
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId);
+      // kullanıcı hesabı hala aktif mi kontrol et
+      if (!user || !user.isActive) {
+        throw new Error("Kullanıcı bulunamadı veya hesap inaktif.");
+      }
+      // return user
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
   async register(userData) {
     // aynı email'de kayıtlı kullanıcı var mı ?
     const existingUser = await User.findOne({ email: userData.email });
@@ -96,7 +111,6 @@ class AuthService {
       throw new Error("Token doğrulama hatası.");
     }
   }
-  async logout() {}
 }
 
 module.exports = new AuthService();
