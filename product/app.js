@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 // proje içi importları
-const authRoutes = require("./src/auth.routes");
+const productRoutes = require("./src/product.routes");
 // dotenv
 
 require("dotenv").config();
@@ -33,8 +33,8 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter); // rate limiter middleware'ı ekle
 
-// auth route'ları ekle
-app.use("/api/auth", authRoutes);
+// product route'ları ekle
+app.use("/api/products", productRoutes);
 
 // hata middleware'ı
 
@@ -51,4 +51,4 @@ app.use((req, res, next) => {
 
 // server'ın başlatılması
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Auth server ${PORT} portunda başlatıldı`));
+app.listen(PORT, () => console.log(`Product server ${PORT} portunda başlatıldı`));
