@@ -30,10 +30,10 @@ const limiter = rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW * 60 * 1000, //
   max: process.env.RATE_LIMIT_MAX_REQUESTS, // 15 saniyede 100 kere request atabilir
 });
-app.use("/api", limiter); // rate limiter middleware'ı ekle
+app.use("/", limiter); // rate limiter middleware'ı ekle
 
 // auth route'ları ekle
-app.use("/api/auth", authRoutes);
+app.use("/", authRoutes);
 
 // hata middleware'ı
 
