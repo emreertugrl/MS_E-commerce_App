@@ -1,4 +1,4 @@
 .env
 .env.dev
 node_modules/
-module_template
+postman_collection.json
