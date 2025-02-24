@@ -66,7 +66,16 @@ class ProductController {
   }
   async updateStock(req, res, next) {
     try {
-      res.status(200).json("Stok Güncellendi");
+      const { id } = req.params;
+      const { quantity } = req.body;
+
+      if (typeof quantity !== "number") {
+        return res.status(400).json({ error: "Miktar, sayı değerinde olmalı." });
+      }
+      // Servic katmanı ile iletişime geç
+      const updatedProduct = await ProductService.updateStock(id, quantity);
+
+      res.status(200).json({ updatedProduct });
     } catch (error) {
       next(error);
     }

@@ -60,6 +60,25 @@ class AuthService {
       throw error;
     }
   }
+  async updateStock(id, quantity) {
+    try {
+      // ürün bulunur
+      const product = await Product.findById(id);
+      // ürün yoksa hata ver
+      if (!product) {
+        throw new Error("Ürün bulunamadı.");
+      }
+      // stok yetersizse hata veri
+      const newStock = product.stock + quantity;
+      if (newStock < 0) {
+        throw new Error("Stok yetersiz.");
+      }
+      // stok arttırılır ve güncellenir.
+      return await Product.findByIdAndUpdate(id, { $inc: { stock: quantity } }, { new: true });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AuthService();
