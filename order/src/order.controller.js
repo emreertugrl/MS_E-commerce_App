@@ -12,7 +12,19 @@ class OrderController {
       next(error);
     }
   }
-  async getOrder(req, res, next) {}
+  async getOrder(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const order = await OrderService.getOrderById(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Sipariş Bulunamadı" });
+      }
+
+      res.status(200).json({ order });
+    } catch (error) {
+      next(error);
+    }
+  }
   async getUserOrders(req, res, next) {}
   async updateOrderStatus(req, res, next) {}
 }

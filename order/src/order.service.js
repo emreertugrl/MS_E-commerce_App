@@ -43,6 +43,17 @@ class OrderService {
       throw error;
     }
   }
+  async getOrderById(orderId) {
+    try {
+      const order = await Order.findById(orderId);
+      if (!order) {
+        throw new Error("Sipariş bulunamadı");
+      }
+      return order;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new OrderService();

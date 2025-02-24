@@ -7,7 +7,7 @@ router.post("/", authenticate, OrderController.createOrder);
 
 router.get("/:orderId", authenticate, OrderController.getOrder);
 
-router.get("/user/:username", authenticate, OrderController.getUserOrders);
+router.get("/user/:userId", authenticate, OrderController.getUserOrders);
 
 router.patch("/:orderId/status", authenticate, admin, OrderController.updateOrderStatus);
 
