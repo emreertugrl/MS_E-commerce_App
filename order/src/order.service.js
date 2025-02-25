@@ -54,6 +54,14 @@ class OrderService {
       throw error;
     }
   }
+  async getUserOrders(userId) {
+    try {
+      const orders = await Order.find({ user: userId });
+      return orders;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new OrderService();
