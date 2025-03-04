@@ -33,7 +33,19 @@ class OrderController {
       next(error);
     }
   }
-  async updateOrderStatus(req, res, next) {}
+  async updateOrderStatus(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      const { status } = req.body;
+      const updatedOrder = await OrderService.updateOrderStatus(orderId, status);
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "Sipariş Bulunamadı" });
+      }
+      res.status(200).json({ message: "Sipariş Durumu Güncellendi", updatedOrder });
+    } catch (error) {
+      res.status(500).json({ error: "Güncellerken bir sorun oluştu" });
+    }
+  }
 }
 
 // örneğini alıp export ederek diğer tarafta kullanabiliriz.
